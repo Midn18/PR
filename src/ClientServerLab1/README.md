@@ -1,0 +1,1 @@
+**Sarcina pentru lab1**
