@@ -7,6 +7,7 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class Client {
+
     private DataOutputStream outputStream = null;
     private DataInputStream inputStream = null;
     private Scanner scanner = null;
@@ -23,7 +24,7 @@ public class Client {
             outputStream = new DataOutputStream(socket.getOutputStream());
             inputStream = new DataInputStream(socket.getInputStream());
         } catch (IOException e) {
-            System.out.println("Error: " + e);
+            throw new RuntimeException("Error: " + e.getCause());
         }
 
         while (!userInput.equals("FINISH")) {
@@ -43,7 +44,7 @@ public class Client {
             inputStream.close();
             socket.close();
         } catch (IOException e) {
-            System.out.println("Error: " + e);
+            throw new RuntimeException("Error: " + e.getCause());
         }
     }
 

@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.net.SocketException;
 
 public class Server {
+
     private DataInputStream inputStream = null;
     private DataOutputStream outputStream = null;
     private Socket socket = null;
@@ -20,7 +21,7 @@ public class Server {
         try {
             serverSocket = new ServerSocket(port);
             System.out.println("Server started!");
-            System.out.println("Waiting for the client->");
+            System.out.println("Waiting for the client ->");
             socket = serverSocket.accept();
 
             if (socket.isConnected()) {
@@ -38,7 +39,7 @@ public class Server {
                     System.out.println(clientMessage);
                     outputStream.writeUTF(serverResponse);
                 } catch (SocketException e) {
-                    System.out.println("Error: " + e);
+                    throw new RuntimeException("Client is disconnected: " + e.getCause());
                 }
             }
 
@@ -48,7 +49,7 @@ public class Server {
             System.out.println("Connection closed!");
 
         } catch (IOException e) {
-            System.out.println("Error: " + e);
+            throw new RuntimeException("Error: " + e.getCause());
         }
     }
 
