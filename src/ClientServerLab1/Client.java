@@ -1,54 +1,53 @@
 package ClientServerLab1;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
-import java.util.Scanner;
 
 public class Client {
 
-    private DataOutputStream outputStream = null;
-    private DataInputStream inputStream = null;
-    private Scanner scanner = null;
-    private Socket socket = null;
+    private static DataOutputStream outputStream = null;
+    private static DataInputStream inputStream = null;
+    private static BufferedReader bufferedReader = null;
+    private static Socket socket = null;
 
-    public Client(String address, int port) {
-        String userInput = "";
+    public static void main(String[] args) throws IOException {
+        String clientMessage = "";
 
-        try {
-            establishConnection(address, port);
-            insertName(scanner);
-            System.out.println("To terminate the session write: FINISH");
-        } catch (IOException e) {
-            throw new RuntimeException("Error: " + e.getCause());
-        }
+        establishConnection("localhost", 9999);
+        System.out.println("Connected with server!");
+        System.out.println("To terminate the session write: FINISH");
+        sendMessage(clientMessage);
 
-        sendMessage(userInput);
-
-        System.out.println("Connection finished!");
+        System.out.println("Connection closed!");
         closeConnection();
     }
 
-    private void establishConnection(String address, int port) {
+    private static void establishConnection(String address, int port) {
         try {
             socket = new Socket(address, port);
-            scanner = new Scanner(System.in);
             inputStream = new DataInputStream(socket.getInputStream());
             outputStream = new DataOutputStream(socket.getOutputStream());
+            bufferedReader = new BufferedReader(new InputStreamReader(System.in));
         } catch (IOException e) {
             System.out.printf("Verify port. Session wasn't established: %s%n", e);
         }
     }
 
-    private void insertName(Scanner scanner) throws IOException {
-        String name;
-        System.out.println("Insert your name: ");
-        name = scanner.nextLine();
-        outputStream.writeUTF(name);
+    private static void sendMessage(String clientMessage) throws IOException {
+        while (!clientMessage.equals("FINISH")) {
+            System.out.println("Enter your miles: ");
+            clientMessage = bufferedReader.readLine();
+            try {
+                outputStream.writeUTF(clientMessage);
+                outputStream.flush();
+                System.out.println("Server: " + inputStream.readUTF());
+            } catch (IOException e) {
+                System.out.println("Server is down. Session is terminated!");
+            }
+        }
     }
 
-    private void closeConnection() {
+    private static void closeConnection() {
         try {
             outputStream.close();
             inputStream.close();
@@ -56,23 +55,5 @@ public class Client {
         } catch (IOException e) {
             throw new RuntimeException("Error: " + e.getCause());
         }
-    }
-
-    private void sendMessage(String userInput) {
-        while (!userInput.equals("FINISH")) {
-            System.out.println("Insert message: ");
-            userInput = scanner.nextLine();
-            try {
-                outputStream.writeUTF(userInput);
-                String serverMessage = inputStream.readUTF();
-                System.out.println(serverMessage);
-            } catch (IOException e) {
-                System.out.println("Server is down. Please insert FINISH to terminate connection!");
-            }
-        }
-    }
-
-    public static void main(String[] args) {
-        Client client = new Client("localhost", 9999);
     }
 }
