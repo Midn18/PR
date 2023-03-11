@@ -15,36 +15,60 @@ public class Client {
 
     public Client(String address, int port) {
         String userInput = "";
-        String serverMessage = "";
 
         try {
-            socket = new Socket(address, port);
+            establishConnection(address, port);
+            insertName(scanner);
             System.out.println("To terminate the session write: FINISH");
-            scanner = new Scanner(System.in);
-            outputStream = new DataOutputStream(socket.getOutputStream());
-            inputStream = new DataInputStream(socket.getInputStream());
         } catch (IOException e) {
             throw new RuntimeException("Error: " + e.getCause());
         }
 
-        while (!userInput.equals("FINISH")) {
-            userInput = scanner.nextLine();
-            try {
-                outputStream.writeUTF(userInput);
-                serverMessage = inputStream.readUTF();
-                System.out.println(serverMessage);
-            } catch (IOException e) {
-                System.out.println("Server is down. Please insert FINISH to terminate connection!");
-            }
-        }
+        sendMessage(userInput);
 
         System.out.println("Connection finished!");
+        closeConnection();
+    }
+
+    private void establishConnection(String address, int port) {
+        try {
+            socket = new Socket(address, port);
+            scanner = new Scanner(System.in);
+            inputStream = new DataInputStream(socket.getInputStream());
+            outputStream = new DataOutputStream(socket.getOutputStream());
+        } catch (IOException e) {
+            System.out.printf("Verify port. Session wasn't established: %s%n", e);
+        }
+    }
+
+    private void insertName(Scanner scanner) throws IOException {
+        String name;
+        System.out.println("Insert your name: ");
+        name = scanner.nextLine();
+        outputStream.writeUTF(name);
+    }
+
+    private void closeConnection() {
         try {
             outputStream.close();
             inputStream.close();
             socket.close();
         } catch (IOException e) {
             throw new RuntimeException("Error: " + e.getCause());
+        }
+    }
+
+    private void sendMessage(String userInput) {
+        while (!userInput.equals("FINISH")) {
+            System.out.println("Insert message: ");
+            userInput = scanner.nextLine();
+            try {
+                outputStream.writeUTF(userInput);
+                String serverMessage = inputStream.readUTF();
+                System.out.println(serverMessage);
+            } catch (IOException e) {
+                System.out.println("Server is down. Please insert FINISH to terminate connection!");
+            }
         }
     }
 
