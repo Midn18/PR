@@ -17,10 +17,10 @@ public class ServerClientThread extends Thread {
     }
 
     public void run() {
-        String clientMessage = "";
+//        String clientMessage = "";
 
         establishConnection();
-        processMessage(clientMessage);
+        processMessage();
         closeConnection();
 
         System.out.println("Client " + clientNumber + " is disconnected!");
@@ -36,10 +36,14 @@ public class ServerClientThread extends Thread {
         }
     }
 
-    private void processMessage(String clientMessage) {
-        while (!clientMessage.equals("FINISH")) {
+    private void processMessage() {
+        while (true) {
             try {
-                clientMessage = inputStream.readUTF();
+                String clientMessage = inputStream.readUTF();
+                if (clientMessage.equals("FINISH")) {
+                    closeConnection();
+                    break;
+                }
                 System.out.println("Client " + clientNumber + " message: " + clientMessage);
                 String serverMessage = String.format("%s miles is %s km", clientMessage, milesToKm(Double.parseDouble(clientMessage)));
                 outputStream.writeUTF(serverMessage);
