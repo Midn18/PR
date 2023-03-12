@@ -9,6 +9,7 @@ public class ServerClientThread extends Thread {
     private DataOutputStream outputStream = null;
     private DataInputStream inputStream = null;
     private Socket serverClient;
+    private static final String FINISH = "FINISH";
     int clientNumber;
 
     public ServerClientThread(Socket inSocket, int counter) throws IOException {
@@ -17,8 +18,6 @@ public class ServerClientThread extends Thread {
     }
 
     public void run() {
-//        String clientMessage = "";
-
         establishConnection();
         processMessage();
         closeConnection();
@@ -40,7 +39,7 @@ public class ServerClientThread extends Thread {
         while (true) {
             try {
                 String clientMessage = inputStream.readUTF();
-                if (clientMessage.equals("FINISH")) {
+                if (clientMessage.equals(FINISH)) {
                     closeConnection();
                     break;
                 }
