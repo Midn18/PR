@@ -9,14 +9,14 @@ public class Client {
     private static DataInputStream inputStream = null;
     private static BufferedReader bufferedReader = null;
     private static Socket socket = null;
+    private static final String FINISH = "FINISH";
 
     public static void main(String[] args) throws IOException {
-        String clientMessage = "";
-
         establishConnection("localhost", 9999);
         System.out.println("Connected with server!");
         System.out.println("To terminate the session write: FINISH");
-        sendMessage(clientMessage);
+        
+        sendMessage();
 
         System.out.println("Connection closed!");
         closeConnection();
@@ -33,10 +33,18 @@ public class Client {
         }
     }
 
-    private static void sendMessage(String clientMessage) throws IOException {
-        while (!clientMessage.equals("FINISH")) {
+    private static void sendMessage() throws IOException {
+        while (true) {
             System.out.println("Enter your miles: ");
-            clientMessage = bufferedReader.readLine();
+            String clientMessage = bufferedReader.readLine();
+
+            if (clientMessage.equals(FINISH)) {
+                outputStream.writeUTF(clientMessage);
+                outputStream.flush();
+                closeConnection();
+                break;
+            }
+
             try {
                 outputStream.writeUTF(clientMessage);
                 outputStream.flush();
