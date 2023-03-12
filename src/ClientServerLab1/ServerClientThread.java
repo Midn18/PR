@@ -21,10 +21,7 @@ public class ServerClientThread extends Thread {
         establishConnection();
         processMessage();
         closeConnection();
-
-        System.out.println("Client " + clientNumber + " is disconnected!");
     }
-
 
     private void establishConnection() {
         try {
@@ -43,19 +40,20 @@ public class ServerClientThread extends Thread {
                     closeConnection();
                     break;
                 }
-                System.out.println("Client " + clientNumber + " message: " + clientMessage);
+                System.out.printf("Client %d message: %s%n", clientNumber, clientMessage);
                 String serverMessage = String.format("%s miles is %s km", clientMessage, milesToKm(Double.parseDouble(clientMessage)));
                 outputStream.writeUTF(serverMessage);
                 outputStream.flush();
             } catch (IOException e) {
-                System.out.println("Server is down. Session is terminated!");
+                System.out.printf("Client %s disconnected. Session is terminated!%n", clientNumber);
+                closeConnection();
+                break;
             }
         }
     }
 
     private Double milesToKm(Double miles) {
-        var km = 0.0;
-        return km = miles * 1.609;
+        return miles * 1.609;
     }
 
     private void closeConnection() {

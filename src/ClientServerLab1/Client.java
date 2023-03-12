@@ -51,6 +51,8 @@ public class Client {
                 System.out.println("Server: " + inputStream.readUTF());
             } catch (IOException e) {
                 System.out.println("Server is down. Session is terminated!");
+                closeConnection();
+                break;
             }
         }
     }
