@@ -8,16 +8,24 @@ public class Client {
     private static DataOutputStream outputStream = null;
     private static DataInputStream inputStream = null;
     private static BufferedReader bufferedReader = null;
+    static Thread sendMessage;
+    static Thread receiveMessage;
     private static Socket socket = null;
     private static final String FINISH = "FINISH";
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         establishConnection("localhost", 9999);
         System.out.println("Connected with server!");
         System.out.println("To terminate the session write: FINISH");
-        
-        sendMessage();
+        sendMessage = new Thread(Client::sendMessage);
+        receiveMessage = new Thread(Client::receiveMessage);
 
+        while (socket.isConnected()) {
+            if (sendMessage.isAlive() && receiveMessage.isAlive())
+                continue;
+            sendMessage.start();
+            receiveMessage.start();
+        }
         System.out.println("Connection closed!");
         closeConnection();
     }
@@ -33,22 +41,33 @@ public class Client {
         }
     }
 
-    private static void sendMessage() throws IOException {
-        while (true) {
-            System.out.println("Enter your miles: ");
-            String clientMessage = bufferedReader.readLine();
+    private static void sendMessage() {
+        while (socket.isConnected()) {
+            try {
+                System.out.println("-> ");
+                String clientMessage = bufferedReader.readLine();
 
-            if (clientMessage.equals(FINISH)) {
+                if (clientMessage.equals(FINISH)) {
+                    outputStream.writeUTF(clientMessage);
+                    outputStream.flush();
+                    closeConnection();
+                    break;
+                }
                 outputStream.writeUTF(clientMessage);
                 outputStream.flush();
+            } catch (IOException e) {
+                System.out.println("Server is down. Session is terminated!");
                 closeConnection();
                 break;
             }
+        }
+    }
 
+    private static void receiveMessage() {
+        while (socket.isConnected()) {
             try {
-                outputStream.writeUTF(clientMessage);
-                outputStream.flush();
-                System.out.println("Server: " + inputStream.readUTF());
+                String serverMessage = inputStream.readUTF();
+                System.out.println(serverMessage);
             } catch (IOException e) {
                 System.out.println("Server is down. Session is terminated!");
                 closeConnection();
@@ -62,6 +81,8 @@ public class Client {
             outputStream.close();
             inputStream.close();
             socket.close();
+            sendMessage.stop();
+            receiveMessage.stop();
         } catch (IOException e) {
             throw new RuntimeException("Error: " + e.getCause());
         }

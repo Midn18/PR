@@ -24,3 +24,4 @@ hs_err_pid*
 replay_pid*
 /out/production/PR/ClientServerLab1/Client.class
 /.idea/jpa-buddy.xml
+.idea/uiDesigner.xml
