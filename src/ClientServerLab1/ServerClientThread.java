@@ -33,27 +33,25 @@ public class ServerClientThread extends Thread {
     }
 
     private void processMessage() {
-        while (true) {
+        while (serverClient.isConnected()) {
             try {
                 String clientMessage = inputStream.readUTF();
                 if (clientMessage.equals(FINISH)) {
+                    MultithreadedSocketServer.clients.remove(serverClient);
+                    System.out.printf("Client %s disconnected.", clientNumber);
                     closeConnection();
                     break;
                 }
-                System.out.printf("Client %d message: %s%n", clientNumber, clientMessage);
-                String serverMessage = String.format("%s miles is %s km", clientMessage, milesToKm(Double.parseDouble(clientMessage)));
-                outputStream.writeUTF(serverMessage);
-                outputStream.flush();
+                var response = String.format("Client %d: %s", clientNumber, clientMessage);
+                System.out.println(response);
+                MultithreadedSocketServer.sendMessageToAllClients(response, serverClient);
             } catch (IOException e) {
                 System.out.printf("Client %s disconnected. Session is terminated!%n", clientNumber);
+                MultithreadedSocketServer.clients.remove(serverClient);
                 closeConnection();
                 break;
             }
         }
-    }
-
-    private Double milesToKm(Double miles) {
-        return miles * 1.609;
     }
 
     private void closeConnection() {
