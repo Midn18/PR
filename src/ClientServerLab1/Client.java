@@ -25,7 +25,15 @@ public class Client {
                 continue;
             sendMessage.start();
             receiveMessage.start();
+            break;
         }
+        try {
+            sendMessage.join();
+            receiveMessage.join();
+        } catch (InterruptedException e) {
+            System.out.println("Closing error: " + e);
+        }
+
         System.out.println("Connection closed!");
         closeConnection();
     }
@@ -69,7 +77,7 @@ public class Client {
                 String serverMessage = inputStream.readUTF();
                 System.out.println(serverMessage);
             } catch (IOException e) {
-                System.out.println("Server is down. Session is terminated!");
+                System.out.println("Session is terminated!");
                 closeConnection();
                 break;
             }
@@ -81,8 +89,6 @@ public class Client {
             outputStream.close();
             inputStream.close();
             socket.close();
-            sendMessage.stop();
-            receiveMessage.stop();
         } catch (IOException e) {
             throw new RuntimeException("Error: " + e.getCause());
         }
