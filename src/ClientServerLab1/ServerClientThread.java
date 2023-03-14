@@ -38,7 +38,7 @@ public class ServerClientThread extends Thread {
                 String clientMessage = inputStream.readUTF();
                 if (clientMessage.equals(FINISH)) {
                     MultithreadedSocketServer.clients.remove(serverClient);
-                    System.out.printf("Client %s disconnected.", clientNumber);
+                    System.out.printf("Client %s disconnected.%n", clientNumber);
                     closeConnection();
                     break;
                 }
