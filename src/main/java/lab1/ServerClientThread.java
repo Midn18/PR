@@ -1,4 +1,4 @@
-package ClientServerLab1;
+package lab1;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
