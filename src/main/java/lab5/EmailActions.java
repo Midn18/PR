@@ -190,7 +190,7 @@ public class EmailActions {
             multipart.addBodyPart(messageBodyPart);
 
             messageBodyPart = new MimeBodyPart();
-            String filename = "src/main/java/lab5/fileName.txt";
+            String filename = "src/main/java/lab5/TestEmailWithAttachment.txt";
             DataSource source = new FileDataSource(filename);
             messageBodyPart.setDataHandler(new DataHandler(source));
             messageBodyPart.setFileName(filename);
