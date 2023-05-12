@@ -181,17 +181,17 @@ public class EmailActions {
             message.setFrom(new InternetAddress(user));
             message.setRecipients(Message.RecipientType.TO,
                     InternetAddress.parse(to));
-            message.setSubject("Email with Attachment");
+            message.setSubject(subject);
 
             MimeBodyPart messageBodyPart = new MimeBodyPart();
-            messageBodyPart.setText("Please see the attached file for details.");
+            messageBodyPart.setText(text);
 
             Multipart multipart = new MimeMultipart();
             multipart.addBodyPart(messageBodyPart);
 
             messageBodyPart = new MimeBodyPart();
-            String filename = "src/main/java/lab5/TestEmailWithAttachment.txt";
-            DataSource source = new FileDataSource(filename);
+            String filename = "TestEmailWithAttachment.txt";
+            DataSource source = new FileDataSource("src/main/java/lab5/TestEmailWithAttachment.txt");
             messageBodyPart.setDataHandler(new DataHandler(source));
             messageBodyPart.setFileName(filename);
             multipart.addBodyPart(messageBodyPart);
